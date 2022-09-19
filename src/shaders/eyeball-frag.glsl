@@ -40,16 +40,25 @@ float interpNoise3D(vec3 p) {
     float v6 = random3D(vec3(intX + 1, intY, intZ + 1));
     float v7 = random3D(vec3(intX + 1, intY + 1, intZ));
     float v8 = random3D(vec3(intX + 1, intY + 1, intZ + 1));
+    // float v1 = random3D(vec3(intX, intY, intZ));
+    // float v2 = random3D(vec3(intX + 1, intY, intZ));
+    // float v3 = random3D(vec3(intX, intY + 1, intZ));
+    // float v4 = random3D(vec3(intX + 1, intY + 1, intZ));
 
-    float i1 = mix(v1, v2, fractX);
-    float i2 = mix(v3, v4, fractX);
+    // float v5 = random3D(vec3(intX, intY, intZ + 1));
+    // float v6 = random3D(vec3(intX + 1, intY, intZ + 1));
+    // float v7 = random3D(vec3(intX, intY + 1, intZ + 1));
+    // float v8 = random3D(vec3(intX + 1, intY + 1, intZ + 1));
+
+    float i1 = mix(v1, v2, fractZ);
+    float i2 = mix(v3, v4, fractZ);
     float i3 = mix(i1, i2, fractY);
     
-    float i4 = mix(v5, v6, fractX);
-    float i5 = mix(v7, v8, fractX);
+    float i4 = mix(v5, v6, fractZ);
+    float i5 = mix(v7, v8, fractZ);
     float i6 = mix(i4, i5, fractY);
 
-    return mix(i3, i6, fractZ);
+    return mix(i3, i6, fractX);
 }
 
 float fbm(vec3 p) {
