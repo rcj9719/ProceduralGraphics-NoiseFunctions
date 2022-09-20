@@ -80,35 +80,57 @@ float fbm(vec3 p, float freq, float persistence) {
     return total;
 }
 
-
-
 void main() {
     vec4 baseCol = vec4(1.0, 1.0, 0.0, 1.0);
     float theta = atan(fs_Pos.x, fs_Pos.y);
     float r = sqrt(pow(fs_Pos.x, 2.0f) + pow(fs_Pos.y, 2.0f));
-    //vec4 blue = vec4(0.0, 0.0, 1.0f, 1.0) * fbm(vec3(fs_Pos.xyz), 2.f, 0.5f);
-    out_Col = fs_Pos;
-    if(fs_Pos.z >= 0.99f && fs_Pos.z <= 1.0f) {
-        // pupil
-        out_Col = mix(vec4(0.0, 0.0, 0.0, 1.0), vec4(r, r, r, 1.0), 0.95);
-    }
-    else if(fs_Pos.z >= 0.9f && fs_Pos.z <= 0.99f) {
-        // iris
+    vec4 brown = vec4(0.36, 0.29, 0.01, 1.0) * fbm(vec3(fs_Pos.xyz), 2.f, 0.5f);
+    vec4 green = vec4(0.24, abs(sin(0.4 * r * 20.f)), cos(0.22 * r * 90.f), 1.0);    
+    vec4 blue = vec4(0.0, 0.0, 1.0, 1.0);
 
-        // float theta = (fs_Pos.x > -0.01f && fs_Pos.x < 0.01f) ? fs_Pos.x : fs_Pos.y/fs_Pos.x;
-        // vec4 eye_blue = vec4(0.0, 0.0, 1.0f, 1.0) * (cos(theta * 70.f)) * cos(fbm(vec3(fs_Pos.xyz), 2.f, 0.5f)) ;
-        // vec4 eye_green = vec4(0.0, 1.0, 1.0f, 1.0) * (cos(theta * 50.f + 3.14f/2.f));
-        // vec4 eye_green2 = vec4(36.f/255.f, 110.f/255.f, 52.f/255.f, 1.0) * (cos(theta * 100.f + 3.14f/4.f));
-        // out_Col = mix(eye_green2, mix(eye_blue, eye_green, fbm(vec3(fs_Pos.xyz), 2.f, 20.5f)), 0.5f);
+    vec4 eye_color = vec4(0.0, 0.0, 0.0, 1.0);
+    vec4 pupil_color = vec4(0.0, 0.0, 0.0, 1.0);
+    vec4 iris_color = vec4(0.0, 0.0, 0.0, 1.0);
+    vec4 eyeball_color = vec4(0.0, 0.0, 0.0, 1.0);
+    
+    /*
+     * Pupil Color
+     */
+    // mixes black with r(which depends on x and y) and gives more weight to r
+    // So when both x and y tend to 0, mixed result shows black 
+    float smoothVal = smoothstep(0.9, 0.99f, fs_Pos.z);
+    //pupil_color = mix(vec4(0.0, 0.0, 0.0, 1.0), smoothVal * vec4(r, r, r, 1.0), 0.98);    // if we multiply smoothvalue here, influence of white disappears when x and y is max
+    pupil_color = mix(vec4(0.0, 0.0, 0.0, 1.0), vec4(r, r, r, 1.0), 0.98);
+    
+    /*
+     * Iris Color
+     */
+    // blue with low persistence noise function
+    float f_blue = fbm(vec3(fs_Pos.xyz), 20.f, 0.7f);
+    blue *= f_blue;
 
-        vec4 blue = vec4(0.07, 0.0, 1.0, 1.0) * fbm(vec3(fs_Pos.xyz), 2.f, 0.5f);  // blue with low persistence noise function
-        vec4 green = vec4(0.14, 0.4, cos(0.22 * r * 90.f), 1.0) * fbm(vec3(fs_Pos.xyz), 2.f, 0.5f);  // increasing blue influence with radius, adjusting green ring position with appropriate multiple 
-        green *= abs(cos(theta * 20.f + 3.14f/2.f));    // multiplying with cos(theta) makes cos wave look like rays around the circle
-        out_Col = mix(green, blue, 0.5f);
-    }
-    else {
-        // outer white eyeball
-        out_Col = vec4(1.0, 0.0, 0.0f, 1.0) * interpNoise3D(vec3(fs_Pos.xyz)) * (0.4 * (-fs_Pos.z + 1.5f));//, 2.0f, 0.5f);
-    }
+    // increasing blue influence with radius and adjusting green ring position with appropriate multiple
+    float f_green = fbm(vec3(fs_Pos.xyz), 20.f, 0.5f);
+    green *= f_green;
 
+    // multiplying with cos(theta) makes cos wave look like rays around the circle
+    // use sin function based on z to set a varying phase difference
+    float f_brown = fbm(vec3(fs_Pos.xyz), 2.f, 0.5f);
+    brown = vec4(0.36, 0.29, 0.01, 1.0) * f_brown;
+    brown *= abs(cos(theta * 20.f - sin(fs_Pos.z * interpNoise3D(fs_Pos.xyz) * 100.f) * 3.14f/8.f));
+
+    // In smoothstep function below, fs_Pos.z value changes from 0.98 to 0.99, value gradually decreases
+    // Subtracting it from 1.0 inverses the effect, so as fs_Pos.z moves towards 0.99, the value increases
+    smoothVal = smoothstep(0.98, 0.99f, fs_Pos.z);
+
+    iris_color = mix(mix(green, blue, 0.5f), brown, f_brown);
+    iris_color *= (1.f - smoothVal);
+    
+    /*
+     * Outer white eyeball color
+     */
+    eyeball_color = vec4(1.0, 0.0, 0.0f, 1.0) * interpNoise3D(vec3(fs_Pos.xyz)) * (0.4 * (-fs_Pos.z + 1.5f));
+
+    eye_color = pupil_color + iris_color + eyeball_color;
+    out_Col = eye_color;
 }
