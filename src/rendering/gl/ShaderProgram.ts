@@ -28,6 +28,7 @@ class ShaderProgram {
   unifModelInvTr: WebGLUniformLocation;
   unifViewProj: WebGLUniformLocation;
   unifColor: WebGLUniformLocation;
+  unifOffset: WebGLUniformLocation;
 
   unifRef: WebGLUniformLocation;
   unifEye: WebGLUniformLocation;
@@ -56,6 +57,7 @@ class ShaderProgram {
     this.unifModelInvTr = gl.getUniformLocation(this.prog, "u_ModelInvTr");
     this.unifViewProj   = gl.getUniformLocation(this.prog, "u_ViewProj");
     this.unifColor      = gl.getUniformLocation(this.prog, "u_Color");
+    this.unifOffset = gl.getAttribLocation(this.prog, "u_Offset");
   }
 
   use() {
@@ -92,6 +94,14 @@ class ShaderProgram {
       gl.uniform4fv(this.unifColor, color);
     }
   }
+
+  setOffsetFromCenter(offset: vec4) {
+    this.use();
+    if (this.unifOffset !== -1) {
+      gl.uniform4fv(this.unifOffset, offset);
+    }
+  }
+
   setEyeRefUp(eye: vec3, ref: vec3, up: vec3) {
     this.use();
     if(this.unifEye !== -1) {

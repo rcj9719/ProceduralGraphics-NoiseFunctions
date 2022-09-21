@@ -8,6 +8,8 @@ uniform vec4 u_Color;
 
 in vec4 fs_Col;
 in vec4 fs_Pos;
+in vec4 fs_Nor;
+in vec4 fs_LightVec;
 out vec4 out_Col;
 
 // https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
@@ -18,6 +20,7 @@ out vec4 out_Col;
 //                                   191.999)))) *         
 //                  43758.5453);
 // }
+
 
 float hash( float n )
 {
@@ -117,7 +120,7 @@ void main() {
     // use sin function based on z to set a varying phase difference
     float f_brown = fbm(vec3(fs_Pos.xyz), 2.f, 0.5f);
     brown = vec4(0.36, 0.29, 0.01, 1.0) * f_brown;
-    brown *= abs(cos(theta * 20.f - sin(fs_Pos.z * interpNoise3D(fs_Pos.xyz) * 100.f) * 3.14f/8.f));
+    brown *= abs(cos(theta * 20.f - sin(fs_Pos.z * interpNoise3D(fs_Pos.xyz) * 200.f) * 3.14f/8.f));
 
     // In smoothstep function below, fs_Pos.z value changes from 0.98 to 0.99, value gradually decreases
     // Subtracting it from 1.0 inverses the effect, so as fs_Pos.z moves towards 0.99, the value increases
@@ -131,6 +134,50 @@ void main() {
      */
     eyeball_color = vec4(1.0, 0.0, 0.0f, 1.0) * interpNoise3D(vec3(fs_Pos.xyz)) * (0.4 * (-fs_Pos.z + 1.5f));
 
-    eye_color = pupil_color + iris_color + eyeball_color;
+    //eye_color = eyeball_color + iris_color + pupil_color;
+
+    if(fs_Pos.z > 0.998) {
+        eye_color = pupil_color;
+    }
+    else if (fs_Pos.z > 0.9 &&  fs_Pos.z < 0.998) {
+        eye_color = pupil_color + iris_color;
+    }
+    else if (fs_Pos.z > 0.84 &&  fs_Pos.z < 0.9) {
+        eye_color = mix(pupil_color + iris_color, eyeball_color, (1.f - fs_Pos.z) * 6.2f);
+    }
+    // behind the eyeball to get red waves/veins
+    else if (fs_Pos.z < -0.2) {
+        eye_color = mix(iris_color, eyeball_color, (1.f - fs_Pos.z) * 0.8f);
+    }
+    else {
+        eye_color = mix(iris_color, eyeball_color, 0.95f);
+    }
     out_Col = eye_color;
+
+    // // Material base color (before shading)
+    // //vec4 diffuseColor = texture(u_Texture, fs_UV);
+
+    // // Calculate the diffuse term for Lambert shading
+    // vec4 N = vec4(normalize(fs_Pos.xyz), 0.0);
+    // float diffuseTerm = dot(N, normalize(fs_LightVec));
+    // // Avoid negative lighting values
+    // diffuseTerm = clamp(diffuseTerm, 0.f, 1.f);
+
+    // float ambientTerm = 0.2f;
+    // float specularTerm;
+
+    // vec4 V, L, H;
+    // float shininess = 50.;
+    // L = normalize(fs_LightVec);
+    // V = normalize(vec4(u_Eye.xyz - fs_Pos.xyz, 0.0));
+    // H = V;//(V + L) / 2.0;
+    // specularTerm = dot(normalize(H), normalize(N));// * diffuseTerm;
+
+    // float lightIntensity = diffuseTerm + specularTerm + ambientTerm;   //Add a small float value to the color multiplier
+    //                                                     //to simulate ambient lighting. This ensures that faces that are not
+    //                                                     //lit by our point light are not completely black.
+
+    // // Compute final shaded color
+
+    // out_Col = vec4(specularTerm, specularTerm, specularTerm, 1.0);
 }

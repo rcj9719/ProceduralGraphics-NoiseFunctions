@@ -41,10 +41,11 @@ void main() {
                                                             // perpendicular to the surface after the surface is transformed by
                                                             // the model matrix.
 
-    vec4 modelposition = u_Model * (vs_Pos);   // Temporarily store the transformed vertex positions for use below
-
+    vec4 modelposition = u_Model * (vs_Pos); //(vs_Pos -  vec4(1.0) * sin(u_Time * 0.05));   // Temporarily store the transformed vertex positions for use below
+    //modelposition += sfrand(int(vs_Nor.x)) * vs_Nor * sin(u_Time * 0.05);
     fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
 
-    fs_Pos = u_ViewProj * modelposition;
-    gl_Position = u_ViewProj * modelposition;
+    fs_Pos = modelposition;
+    //gl_Position = u_ViewProj * modelposition;
+    gl_Position = u_ViewProj * (vs_Pos) + unifOffset;
 }
