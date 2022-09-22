@@ -11,8 +11,10 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  tesselations: 5,
+  blue_persistence: 0.7,
+  red_persistence: 0.6,
   'Load Scene': loadScene, // A function pointer, essentially
+  color : [255,0,0,1]
 };
 
 let icosphere: Icosphere;
@@ -20,7 +22,7 @@ let square: Square;
 let time: number = 0;
 
 function loadScene() {
-  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
+  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, 5);
   icosphere.create();
   square = new Square(vec3.fromValues(0, 0, 0));
   square.create();
@@ -105,8 +107,21 @@ function main() {
   // stats.domElement.style.top = '0px';
   // document.body.appendChild(stats.domElement);
 
+  var obj = {
+    reset:function(){ 
+      controls.blue_persistence = 0.7;
+      controls.red_persistence = 0.6;
+      controls.color = [255,0,0,1];
+  }
+  };
+
   // Add controls to the gui
   const gui = new DAT.GUI();
+  gui.add(controls, 'blue_persistence', 0.0, 1.0).step(0.1).name('Iris Blue').listen();
+  gui.add(controls, 'red_persistence', 0.0, 1.0).step(0.1).name('Redness').listen();
+  //gui.add(controls, 'Load Scene');
+  gui.addColor(controls, 'color').name('Background').listen();
+  gui.add(obj,'reset').name('Click here to reset to default');
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -152,7 +167,7 @@ function main() {
     processKeyPresses();
     renderer.render(camera, [eyeball_shader, flat], [
       icosphere, square
-    ], time);
+    ], time, controls.color, controls.blue_persistence, controls.red_persistence);
     time++;
     // stats.end();
 

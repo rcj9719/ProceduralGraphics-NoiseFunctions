@@ -30,6 +30,7 @@ out vec4 fs_Col;            // The color of each vertex. This is implicitly pass
 const vec4 lightPos = vec4(5, 5, 3, 1); //The position of our virtual light, which is used to compute the shading of
                                         //the geometry in the fragment shader.
 
+
 void main() {
 
     fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation
@@ -42,10 +43,9 @@ void main() {
                                                             // the model matrix.
 
     vec4 modelposition = u_Model * (vs_Pos); //(vs_Pos -  vec4(1.0) * sin(u_Time * 0.05));   // Temporarily store the transformed vertex positions for use below
-    //modelposition += sfrand(int(vs_Nor.x)) * vs_Nor * sin(u_Time * 0.05);
+
     fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
 
     fs_Pos = modelposition;
-    //gl_Position = u_ViewProj * modelposition;
-    gl_Position = u_ViewProj * (vs_Pos) + unifOffset;
+    gl_Position = u_ViewProj * modelposition;
 }

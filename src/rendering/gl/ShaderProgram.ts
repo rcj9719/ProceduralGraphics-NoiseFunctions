@@ -29,6 +29,8 @@ class ShaderProgram {
   unifViewProj: WebGLUniformLocation;
   unifColor: WebGLUniformLocation;
   unifOffset: WebGLUniformLocation;
+  unifBluePersistance: WebGLUniformLocation;
+  unifRedPersistance: WebGLUniformLocation;
 
   unifRef: WebGLUniformLocation;
   unifEye: WebGLUniformLocation;
@@ -57,7 +59,9 @@ class ShaderProgram {
     this.unifModelInvTr = gl.getUniformLocation(this.prog, "u_ModelInvTr");
     this.unifViewProj   = gl.getUniformLocation(this.prog, "u_ViewProj");
     this.unifColor      = gl.getUniformLocation(this.prog, "u_Color");
-    this.unifOffset = gl.getAttribLocation(this.prog, "u_Offset");
+    this.unifOffset = gl.getUniformLocation(this.prog, "u_Offset");
+    this.unifBluePersistance = gl.getUniformLocation(this.prog, "u_BluePersistence");
+    this.unifRedPersistance = gl.getUniformLocation(this.prog, "u_RedPersistence");
   }
 
   use() {
@@ -99,6 +103,20 @@ class ShaderProgram {
     this.use();
     if (this.unifOffset !== -1) {
       gl.uniform4fv(this.unifOffset, offset);
+    }
+  }
+
+  setBluePersistence(blue_persistence: number) {
+    this.use();
+    if (this.unifBluePersistance !== -1) {
+      gl.uniform1f(this.unifBluePersistance, blue_persistence);
+    }
+  }
+
+  setRedness(redness: number) {
+    this.use();
+    if (this.unifRedPersistance !== -1) {
+      gl.uniform1f(this.unifRedPersistance, redness);
     }
   }
 

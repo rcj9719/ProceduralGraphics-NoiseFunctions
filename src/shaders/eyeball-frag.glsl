@@ -5,22 +5,14 @@ uniform vec3 u_Eye, u_Ref, u_Up;
 uniform vec2 u_Dimensions;
 uniform float u_Time;
 uniform vec4 u_Color;
+uniform float u_BluePersistence;
+uniform float u_RedPersistence;
 
 in vec4 fs_Col;
 in vec4 fs_Pos;
 in vec4 fs_Nor;
 in vec4 fs_LightVec;
 out vec4 out_Col;
-
-// https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
-
-// float random3D( vec3 p ) {
-//     return fract(sin((dot(p, vec3(127.1,
-//                                   311.7,
-//                                   191.999)))) *         
-//                  43758.5453);
-// }
-
 
 float hash( float n )
 {
@@ -39,6 +31,34 @@ float random3D( vec3 x )
     return mix(mix( hash(n+  0.0), hash(n+  1.0),f.x),
                mix( hash(n+ 57.0), hash(n+ 58.0),f.x),f.y);
 }
+
+float surflet(vec2 P, vec2 gridPoint) {
+    // Compute falloff function by converting linear distance to a polynomial
+    float distX = abs(P.x - gridPoint.x);
+    float distY = abs(P.y - gridPoint.y);
+    float tX = 1.f - 6.f * pow(distX, 5.f) + 15.f * pow(distX, 4.f) - 10.f * pow(distX, 3.f);
+    float tY = 1.f - 6.f * pow(distY, 5.f) + 15.f * pow(distY, 4.f) - 10.f * pow(distY, 3.f);
+    // Get the random vector for the grid point
+    vec2 gradient = 2.f * random3D(vec3(gridPoint.xy, 1.0)) - vec2(1.f);
+    // Get the vector from the grid point to P
+    vec2 diff = P - gridPoint;
+    // Get the value of our height field by dotting grid->P with our gradient
+    float height = dot(diff, gradient);
+    // Scale our height field (i.e. reduce it) by our polynomial falloff function
+    return height * tX * tY;
+}
+
+float perlinNoise(vec2 uv) {
+	float surfletSum = 0.f;
+	// Iterate over the four integer corners surrounding uv
+	for(int dx = 0; dx <= 1; ++dx) {
+		for(int dy = 0; dy <= 1; ++dy) {
+			surfletSum += surflet(uv, floor(uv) + vec2(dx, dy));
+		}
+	}
+	return surfletSum;
+}
+
 
 float interpNoise3D(vec3 p) {
     int intX = int(floor(p.x));
@@ -109,7 +129,7 @@ void main() {
      * Iris Color
      */
     // blue with low persistence noise function
-    float f_blue = fbm(vec3(fs_Pos.xyz), 20.f, 0.7f);
+    float f_blue = fbm(vec3(fs_Pos.xyz), 20.f, u_BluePersistence);//0.7f);
     blue *= f_blue;
 
     // increasing blue influence with radius and adjusting green ring position with appropriate multiple
@@ -132,7 +152,10 @@ void main() {
     /*
      * Outer white eyeball color
      */
-    eyeball_color = vec4(1.0, 0.0, 0.0f, 1.0) * interpNoise3D(vec3(fs_Pos.xyz)) * (0.4 * (-fs_Pos.z + 1.5f));
+    float f_red = fbm(vec3(fs_Pos.xyz), 1.f, u_RedPersistence);
+    //float f_red = mix(interpNoise3D(vec3(fs_Pos.xyz)), sin(perlinNoise(vec2(fs_Pos.xy)) * 10.f), 0.1);
+    //float f_red = interpNoise3D(vec3(fs_Pos.xyz));
+    eyeball_color = vec4(1.0, 0.0, 0.0f, 1.0) * f_red * (0.4 * (-fs_Pos.z + 1.5f));
 
     //eye_color = eyeball_color + iris_color + pupil_color;
 
@@ -143,14 +166,14 @@ void main() {
         eye_color = pupil_color + iris_color;
     }
     else if (fs_Pos.z > 0.84 &&  fs_Pos.z < 0.9) {
-        eye_color = mix(pupil_color + iris_color, eyeball_color, (1.f - fs_Pos.z) * 6.2f);
+        eye_color = mix(iris_color, eyeball_color, (1.f - fs_Pos.z) * 0.5f);
     }
     // behind the eyeball to get red waves/veins
-    else if (fs_Pos.z < -0.2) {
-        eye_color = mix(iris_color, eyeball_color, (1.f - fs_Pos.z) * 0.8f);
+    else if (fs_Pos.z < 0.0) {
+        eye_color = mix(iris_color, eyeball_color, (1.f - fs_Pos.z));
     }
     else {
-        eye_color = mix(iris_color, eyeball_color, 0.95f);
+        eye_color = mix(iris_color, eyeball_color, 0.99f);
     }
     out_Col = eye_color;
 

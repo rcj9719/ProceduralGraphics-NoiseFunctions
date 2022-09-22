@@ -22,7 +22,7 @@ class OpenGLRenderer {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
-  render(camera: Camera, prog: Array<ShaderProgram>, drawables: Array<Drawable>, time: number) {
+  render(camera: Camera, prog: Array<ShaderProgram>, drawables: Array<Drawable>, time: number, col: number[], blue_persistence: number, red_persistence: number) {
     //prog.setEyeRefUp(camera.controls.eye, camera.controls.center, camera.controls.up);
     prog[0].setTime(time);
     let model = mat4.create();
@@ -36,7 +36,9 @@ class OpenGLRenderer {
     prog[0].setModelMatrix(model);
     prog[0].setViewProjMatrix(viewProj);
     prog[0].setGeometryColor(color);
-    prog[0].setOffsetFromCenter(offset);
+    //prog[0].setOffsetFromCenter(offset);
+    prog[0].setBluePersistence(blue_persistence);
+    prog[0].setRedness(red_persistence);
     prog[0].draw(drawables[0]);
     // for (let drawable of drawables) {
     //   prog[0].draw(drawable);
@@ -49,8 +51,10 @@ class OpenGLRenderer {
     prog[1].setEyeRefUp(camera.position, camera.direction, camera.up);
     prog[1].setModelMatrix(model);
     prog[1].setViewProjMatrix(viewProj);
+    
+    color = vec4.fromValues(col[0]/255, col[1]/255, col[2]/255, col[3]);
     prog[1].setGeometryColor(color);
-    prog[1].setOffsetFromCenter(offset);
+    //prog[1].setOffsetFromCenter(offset);
     prog[1].draw(drawables[1]);
 
   }
