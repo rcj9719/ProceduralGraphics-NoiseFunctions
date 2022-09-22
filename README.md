@@ -2,6 +2,7 @@
 Making an eyeball using noise functions
 ---
 Note: some artifacts such as bands/rings which are not smoothly interpolated appear in the gifs on README.md but are not visible in the live demo.
+
 ![](images/Eyeball_final.gif)
 
 ## Introduction
