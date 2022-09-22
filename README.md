@@ -34,7 +34,7 @@ To generate Worley noise,
 
 ![](images/pupil.gif)
 
-The pupil itself mixes black with r(which depends on x and y) and gives more weight to r where ```r = sqrt(x<sup>2</sup> + y<sup>2</sup>);``` where x and y are fragment positions. So when both x and y tend to 0, mixed result shows black.
+The pupil itself mixes black with r(which depends on x and y) and gives more weight to r where r = sqrt(x <sup>2</sup> + y <sup>2</sup> ); where x and y are fragment positions. So when both x and y tend to 0, mixed result shows black.
 
 ### The iris
 
