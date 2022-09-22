@@ -41,6 +41,5 @@ float WorleyNoise(vec2 uv) {
 
 
 void main() {
-
   out_Col = mix(vec4(u_Color),  vec4(0.0, 0.0, 0.0, 1.0) * WorleyNoise(fs_Pos.xy +  100.f + mod(u_Time * 0.5f, 1000.f)), 0.5);
 }
