@@ -1,5 +1,5 @@
 # [Project 1: Noise Functions](https://github.com/CIS-566-Fall-2022/hw01-fireball-base)
-Making an eyeball using noise functions - [Click here for live demo](https://632c97460c0c396ccc480d49--peppy-hummingbird-e2f00d.netlify.app/)
+Making an eyeball using noise functions - [Click here for live demo](https://rcj9719.github.io/ProceduralGraphics-NoiseFunctions/)
 ---
 *Note: some artifacts such as bands/rings which don't appear to be interpolating smoothly in the gifs on README.md are not visible in the live demo.*
 
