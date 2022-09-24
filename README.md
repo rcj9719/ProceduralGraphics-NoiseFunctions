@@ -1,6 +1,7 @@
-# [Project 1: Noise](https://github.com/CIS-566-Fall-2022/hw01-fireball-base)
-Making an eyeball using noise functions
+# [Project 1: Noise Functions](https://github.com/CIS-566-Fall-2022/hw01-fireball-base)
+Making an eyeball using noise functions - [Click here for live demo](https://rcj9719.github.io/ProceduralGraphics-NoiseFunctions/)
 ---
+*Note: some artifacts such as bands/rings which don't appear to be interpolating smoothly in the gifs on README.md are not visible in the live demo.*
 
 ![](images/Eyeball_final.gif)
 
@@ -33,7 +34,7 @@ To generate Worley noise,
 
 ![](images/pupil.gif)
 
-The pupil itself mixes black with r(which depends on x and y) and gives more weight to r where ```r = sqrt(x<sup>2</sup> + y<sup>2</sup>);``` where x and y are fragment positions. So when both x and y tend to 0, mixed result shows black.
+The pupil itself mixes black with r(which depends on x and y) and gives more weight to r where r = sqrt(x <sup>2</sup> + y <sup>2</sup> ); where x and y are fragment positions. So when both x and y tend to 0, mixed result shows black.
 
 ### The iris
 
