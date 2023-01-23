@@ -1,5 +1,5 @@
 # [Project 1: Noise Functions](https://github.com/CIS-566-Fall-2022/hw01-fireball-base)
-Making an eyeball using noise functions - [Click here for live demo](https://rcj9719.github.io/ProceduralGraphics-NoiseFunctions/)
+Making an eyeball using noise functions - [Click here for live demo]()
 ---
 *Note: some artifacts such as bands/rings which don't appear to be interpolating smoothly in the gifs on README.md are not visible in the live demo.*
 
@@ -54,3 +54,4 @@ The eyeball is an FBM noise with 8 octaves which distributes the red color. Comb
 1. UPenn CIS 566 Procedural Graphics course slides
 2. UPenn CIS 460 Interactive Computer Graphics course slides
 3. [Inigo Quilez website](https://iquilezles.org/)
+4. [Live demo backup link](https://rcj9719.github.io/ProceduralGraphics-NoiseFunctions/)
